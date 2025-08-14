@@ -13,7 +13,7 @@ services:
       - "${PHP_SERVER_PORT:-8000}:8000"
     volumes:
       - type: bind
-        source: ./src
+        source: ./src/backend
         target: /app
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -34,6 +34,23 @@ services:
       - type: volume
         source: postgres-data
         target: /var/lib/postgresql/data
+    restart: always
+    networks:
+      - app-network
+  node:
+    container_name: ${COMPOSE_PROJECT_NAME}-node
+    build:
+      context: ./docker/node
+    image: ${COMPOSE_PROJECT_NAME}-node
+    ports:
+      - "${NODE_SERVER_PORT:-4200}:4200"
+    volumes:
+      - type: bind
+        source: ./src/frontend
+        target: /app
+    working_dir: /app
+    tty: true
+    user: "node"
     restart: always
     networks:
       - app-network
